@@ -24,7 +24,7 @@ namespace BulkyWeb.Controllers
         [HttpPost]
         public IActionResult Create(Category obj)
         {
-            if(obj.Name !=null||obj.Name == "123")//自定义验证
+            if(obj.Name !=null&&obj.Name == "123")//自定义验证
             {
                 ModelState.AddModelError("name", "Custom Error!");
             }
@@ -32,6 +32,7 @@ namespace BulkyWeb.Controllers
             {
                 _db.Categories.Add(obj);
                 _db.SaveChanges();
+                TempData["success"] = "123";
                 return RedirectToAction("Index");
             }
             return View();
@@ -50,11 +51,33 @@ namespace BulkyWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Categories.Add(obj);
+                _db.Categories.Update(obj);
                 _db.SaveChanges();
+                TempData["success"] = "123";
                 return RedirectToAction("Index");
             }
             return View();
+        }
+
+        public IActionResult Delete(int? id)
+        {
+            if (id == null || id == 0) { return NotFound(); }
+            var category = _db.Categories.Find(id);
+            if (category == null) { return NotFound(); }
+            return View(category);
+        }
+        [HttpPost,ActionName("Delete")]
+        public IActionResult DeletePost(int? id)
+        {
+            Category? category = _db.Categories.Find(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            _db.Categories.Remove(category);
+            _db.SaveChanges();
+            TempData["success"] = "123";
+            return RedirectToAction("Index");
         }
     }
 }
